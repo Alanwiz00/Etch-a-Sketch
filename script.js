@@ -10,6 +10,18 @@ function getColor() {
     return color;
 }
 
+function hexToRGBa(hex, alpha) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) {
+        hex = hex.split('').map(x => x + x).join('');
+    }
+    const num = parseInt(hex, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function createGrid(size) {
     for (let i = 0; i < size * size; i++) {
         const cell = document.createElement('div');
@@ -17,9 +29,19 @@ function createGrid(size) {
         let containerSize = 700;
         cell.style.width = `${containerSize / size}px`;
         cell.style.height = `${containerSize / size}px`;
+        const color = getColor();
+        cell.dataset.color = color;
+        cell.dataset.opcacity = "1";
+        cell.style.backgroundColor = hexToRGBa(color, 0);
         container.appendChild(cell);
+
         cell.addEventListener('mouseover', () => {
-            cell.style.backgroundColor = getColor();
+            let opacity = parseFloat(cell.dataset.opcacity);
+            if (opacity > 0) {
+                opacity = Math.min(opacity - 0.1, 1);
+                cell.dataset.opcacity = opacity.toString();
+                cell.style.backgroundColor = hexToRGBa(cell.dataset.color, opacity);
+            }
         });
     }
 }
